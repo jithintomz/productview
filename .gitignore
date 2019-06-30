@@ -1,0 +1,8 @@
+syntax: glob
+*.pyc
+*.pid
+*.db
+*.orig
+*.sqlite3
+*.csv
+.vscode
