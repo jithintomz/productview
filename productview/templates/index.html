@@ -14,8 +14,13 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/2.1.4/ui-bootstrap-tpls.min.js"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <link href="{{ STATIC_URL }}css/style.css" rel="stylesheet">
+    <link href="{{ STATIC_URL }}css/notification.css" rel="stylesheet">
     <!-- endinject -->
     <link rel="shortcut icon" href="images/favicon.png" />
+    <script src="{{ STATIC_URL }}js/checklist.js?v=1.7">
+    </script>
+    <script src="{{ STATIC_URL }}js/notification.js?v=1.7">
+    </script>
     <script src="{{ STATIC_URL }}js/app/app.js?v=1.7">
     </script>
     <script src="{{ STATIC_URL }}js/app/controller.js?v=1.7">
@@ -27,7 +32,7 @@
         <!-- partial:../../partials/_navbar.html -->
         <nav class="navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
             <div class="text-center navbar-brand-wrapper">
-                <a class="navbar-brand brand-logo" href="#/"><img src="{{ STATIC_URL }}images/logo.svg" alt="logo"></a>
+                <a class="navbar-brand brand-logo" href="#/"><img src="{{ STATIC_URL }}images/acme.png" alt="logo"></a>
                 <a class="navbar-brand brand-logo-mini" href="#/"><img src="{{ STATIC_URL }}images/logo_mini.svg" alt="logo"></a>
             </div>
             <div class="navbar-menu-wrapper d-flex align-items-center">
@@ -61,7 +66,7 @@
                 <nav class="sidebar sidebar-offcanvas" id="sidebar">
                     <ul class="nav">
                         <li class="nav-item nav-category" ng-click="change_mode(1)">
-                            <span class="nav-link">Home</span>
+                            <span class="nav-link">Products</span>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="javascript:void(0)" ng-click = "change_mode(2)">
@@ -69,15 +74,28 @@
                 <i class="icon-grid menu-icon"></i>
               </a>
                         </li>
+                        <li class="nav-item" ng-click="change_mode(3)">
+                            <a class="nav-link">Webhooks</a>
+                        </li>
                     </ul>
                 </nav>
                 <!-- partial -->
                 <div class="content-wrapper">
                     <div class="row">
-                        <div class="col-lg-12 grid-margin stretch-card" ng-hide='mode==2'>
+                        <div class="col-lg-12 grid-margin stretch-card" ng-show='mode==1'>
                             <div class="card">
                                 <div class="card-body">
-                                    <h4 class="card-title col-md-12">Uploads
+                                    <h4 class="card-title col-md-12"><button class="btn btn-danger btn-xst" ng-click="open()"> + New Product</button>
+
+<div class="btn-group">
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Filter
+        </button>
+        <div class="dropdown-menu">
+          <a class="dropdown-item" href="#"><input ng-click="get_products(bigCurrentPage)" type="checkbox" checklist-model="filters" checklist-value=1> &nbsp Active</a>
+          <a class="dropdown-item" href="#"><input ng-click="get_products(bigCurrentPage)" type="checkbox" checklist-model="filters" checklist-value=2> &nbsp InActive</a>
+        </div>
+      </div>
                                     <ul class="pagination-container" previous-text="<" next-text=">" uib-pagination total-items="meta.count" 
                                     ng-model="bigCurrentPage" ng-change="get_products(bigCurrentPage)" max-size="3" class="pagination-sm" 
                                     boundary-link-numbers="true" rotate="false"></ul>
@@ -110,7 +128,8 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-12 grid-margin stretch-card" ng-hide='mode==1'>
+                        <!--End of products table-->
+                        <div class="col-md-12 grid-margin stretch-card" ng-show='mode==2'>
                             <div class="card">
                                 <div class="card-body">
                                     <h4 class="card-title">Upload Csv</h4>
@@ -126,13 +145,49 @@
                                 </div>
                             </div>
                         </div>
+                        <!--End of csv upload-->
+                        <div class="col-lg-12 grid-margin stretch-card" ng-show='mode==3'>
+                            <div class="card">
+                                <div class="card-body">
+                                    <h4 class="card-title col-md-12">Webhooks
+                                    <button class="btn btn-danger btn-xs pull-right" ng-click="open_hook_details()"> + New Hook</button>
+                                    </h4>
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Name</th>
+                                                <th>Updated at</th>
+                                                <th>Trigger</th>
+                                                <th>CallBack Url</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="hook in hooks" class="showonhoverparent">
+                                                <td>{[{hook.name}]}</td>
+                                                <td>{[{hook.updated_time | date : 'short'}]}</td>
+                                                <td class="text-danger"> {[{hook.event_name}]}</td>
+                                                <td style="width: 30%">{[{hook.url}]}</td>
+                                                <td>
+                                                    <button ng-click="open_hook_details(hook)" class="btn btn-outline-primary showonhoverchild">Edit</button>
+                                                </td>
+                                            </tr>
+                                            <tr ng-show="products.length==0">
+                                                <td colspan="4" class="text-center"> No products found</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <!--end of web hooks table-->
                     </div>
                 </div>
                 <!-- content-wrapper ends -->
                 <!-- partial:../../partials/_footer.html -->
                 <footer class="footer">
                     <div class="container-fluid clearfix">
-                        <span class="text-muted d-block text-center text-sm-left d-sm-inline-block">{[{upload_message}]}Copyright © 2018 All rights reserved.</span>
+                        <span class="text-muted d-block text-center text-sm-left d-sm-inline-block">Copyright © 2019 All rights reserved.</span>
                     </div>
                 </footer>
                 <!-- partial -->
@@ -144,10 +199,11 @@
             <span>
                 {[{records_saved}]} Records processed 
             </span>
-            </p>
           </div>
         <!-- page-body-wrapper ends -->
     </div>
+    
+    <!--Product modal template -->
     <script type="text/ng-template" id="myModalContent.html">
         <div class="modal-header">
             <h3 class="modal-title" id="modal-title">Product Details</h3>
@@ -157,15 +213,21 @@
             <div class="col-md-12 grid-margin stretch-card">
                 <div class="card">
                   <div class="card-body">
-                    <form class="forms-sample">
+                    <form name="productForm" class="forms-sample">
                       <div class="form-group">
-                        <input ng-model="$ctrl.product.name" type="text" class="form-control" placeholder="Name">
+                        <input ng-model="$ctrl.product.name" type="text" class="form-control" placeholder="Name" required>
                       </div>
                       <div class="form-group">
-                        <input ng-model="$ctrl.product.sku" type="text" class="form-control" placeholder="SKU">
+                        <input ng-model="$ctrl.product.sku" type="text" class="form-control" placeholder="SKU" required>
                       </div>
                       <div class="form-group">
-                        <textarea ng-model="$ctrl.product.description" class="form-control" rows="5"></textarea>
+                            <label class="radio-inline">
+                                    <label class="radio-inline"><input ng-model=$ctrl.product.is_active type="radio" name="optradio" value=1 checked>Active</label>
+                                    <label class="radio-inline"><input ng-model=$ctrl.product.is_active  type="radio" value=2 name="optradio">Inactive</label>
+                            </label>
+                        </div>
+                      <div class="form-group">
+                        <textarea placeholder="Product description..." ng-model="$ctrl.product.description" class="form-control" rows="5" required></textarea>
                       </div>
                     </form>
                   </div>
@@ -173,10 +235,54 @@
               </div>
         </div>
         <div class="modal-footer">
-            <button class="btn btn-primary" type="button" ng-click="$ctrl.ok()">OK</button>
+            <button class="btn btn-primary" type="button" ng-click="$ctrl.ok(productForm)">OK</button>
             <button class="btn btn-warning" type="button" ng-click="$ctrl.cancel()">Cancel</button>
         </div>
     </script>
+
+    
+    <!--Add webhook modal template -->
+    <script type="text/ng-template" id="webhookContent.html">
+        <div class="modal-header">
+            <h3 class="modal-title" id="modal-title">Hook Details</h3>
+            <button ng-show="$ctrl.hook.id" class="btn btn-danger btn-xs" type="button" ng-click="$ctrl.delete()">Delete</button>
+        </div>
+        <div class="modal-body" id="modal-body">
+            <div class="col-md-12 grid-margin stretch-card">
+                <div class="card">
+                  <div class="card-body">
+                    <form name="hookForm" class="forms-sample">
+                      <div class="form-group">
+                        <label class="col-sm-12 col-form-label">Name</label>
+                        <div class="col-sm-12">
+                        <input ng-model="$ctrl.hook.name" type="text" class="form-control" placeholder="Name" required>
+                    </div>
+                    </div>
+                      <div class="form-group">
+                        <label class="col-sm-12 col-form-label">Trigger</label>
+                        <div class="col-sm-12">
+                        <select class="form-control" ng-init="$ctrl.hook.event=$ctrl.events[0].id" ng-model="$ctrl.hook.event" ng-options="event.id as event.name for event in $ctrl.events" required></select>
+                    </div>
+                      </div>
+                      <div class="form-group">
+                            <label class="col-sm-12 col-form-label">Url</label>
+                            <div class="col-sm-12">
+                        <input ng-model="$ctrl.hook.url" type="url" placeholder="Callbackurl" class="form-control" required>
+                    </div>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" type="button" ng-click="$ctrl.ok(hookForm)">OK</button>
+            <button class="btn btn-warning" type="button" ng-click="$ctrl.cancel()">Cancel</button>
+        </div>
+    </script>
+    
+    
+    
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>

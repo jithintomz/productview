@@ -1,3 +1,5 @@
+"""All websocket consumers used in the product application"""
+
 import json
 
 from channels.generic.websocket import WebsocketConsumer

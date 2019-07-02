@@ -1,4 +1,7 @@
+"""Basic utilities used in the product view application"""
+
 import uuid
+import os
 
 from django.core.files.storage import default_storage
 
@@ -10,7 +13,8 @@ def save_csv(products_file):
     """Saves products csv file to local file system"""
 
     file_name = "{}.csv".format(uuid.uuid4())
-    file_path = default_storage.save(file_name, products_file)
+    file_path = os.path.join("uploads", file_name)
+    file_path = default_storage.save(file_path, products_file)
 
     upload_object = Upload.objects.create(
         file_name=products_file.name, size=products_file.size,
@@ -33,3 +37,17 @@ def gen_chunks(reader, chunksize=100):
             del chunk[:]
         chunk.append(line)
     yield chunk
+
+
+def notify_hooks(event_code, product_object):
+    """Notifies all webhooks about event"""
+    
+    hooks = WebHook.objects.filter(event__code=event_code)
+    event_obj = Event.objects.get(code=event_code)
+    payload = {"product_id": product_object.id, "SKU": product_object.sku,
+               "Name": product_object.name, "Description": product_object.description,
+               "event": event_obj.name}
+    for hook in hooks:
+        tasks.send_payload_url.delay(hook.url, payload)
+    
+    return True

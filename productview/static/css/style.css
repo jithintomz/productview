@@ -15141,7 +15141,7 @@ input:focus {
   transition-delay: 0s;
 }
 .sidebar .nav .nav-item {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  /*border-bottom: 1px solid rgba(255, 255, 255, 0.04);*/
   font-weight: 500;
 }
 .sidebar .nav .nav-item:last-child,
@@ -17428,4 +17428,7 @@ ul li {
   position: absolute;
   z-index: 1000;
   left: 10px;
+}
+.pull-right{
+  float: right !important;
 }
