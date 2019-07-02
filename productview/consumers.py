@@ -35,15 +35,12 @@ class ChatConsumer(WebsocketConsumer):
             self.room_group_name,
             {
                 'type': 'upload_message',
-                'message': message
+                'message': message,
             }
         )
 
     # Receive message from room group
-    def upload_message(self, event):
-        message = event['message']
+    def upload_message(self, event):  
 
         # Send message to WebSocket
-        self.send(text_data=json.dumps({
-            'message': message
-        }))
+        self.send(text_data=json.dumps(event))

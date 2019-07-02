@@ -24,18 +24,26 @@ def parse_products_from_file(upload_id):
         upload_obj.save()
         return {"status": "Failed", "message": "Invalid csv format"}
     channel_layer = get_channel_layer()
-    async_to_sync(channel_layer.group_send)("upload_{}".format(
-        upload_id), {'type': 'upload_message', "message": "Saving to Database"})
-    for chunk in utils.gen_chunks(csv_reader, chunksize=20000):
+    channel_name = "upload_{}".format(upload_id)
+    records_saved = 0
+    chunksize = 20000
+    async_to_sync(channel_layer.group_send)(channel_name, {
+        'type': 'upload_message', "message": "Saving to Products to Database", "saved_records": records_saved, "status": "inprogress"})
+    for chunk in utils.gen_chunks(csv_reader, chunksize=chunksize):
         products = {}
-        
+        async_to_sync(channel_layer.group_send)(channel_name, {
+            'type': 'upload_message', "message": "Saving to Products to Database", "saved_records": records_saved, "status": "inprogress"})
         for row in chunk:
             sku = row[1].lower()
-            product = dict(name=row[0], sku=sku, description=row[2], upload_id=upload_id)
+            product = dict(name=row[0], sku=sku,
+                           description=row[2], upload_id=upload_id)
             products[sku] = product
-
-        Product.objects.bulk_upsert(["sku"],products.values())
-
+        Product.objects.bulk_upsert(["sku"], products.values())
+        records_saved += chunksize
+    upload_obj.processing_status = 2
+    upload_obj.save()
+    async_to_sync(channel_layer.group_send)(channel_name, {
+        'type': 'upload_message',"message":"Products saved successfully", "status": "success", "saved_records": records_saved})
     return {"status": "Success"}
 
 @shared_task

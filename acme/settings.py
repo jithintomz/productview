@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'channels',
     'django_eventstream',
+    'rest_framework',
     'django.contrib.postgres',
     'psqlextra'
 ]
@@ -56,8 +57,8 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'acme.urls'
-DATA_UPLOAD_MAX_MEMORY_SIZE = None
 
+DATA_UPLOAD_MAX_MEMORY_SIZE = None
 
 TEMPLATES = [
     {
@@ -70,6 +71,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.static'
             ],
         },
     },
@@ -93,6 +95,11 @@ DATABASES = {
         'HOST': 'localhost',
         'PORT': '5432',
     }
+}
+
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 10
 }
 
 CHANNEL_LAYERS = {
