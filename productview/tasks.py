@@ -2,6 +2,7 @@
 
 import csv
 import json
+import os
 
 import requests
 from requests.exceptions import RequestException
@@ -51,6 +52,7 @@ def parse_products_from_file(upload_id):
     
     upload_obj.processing_status = 2
     upload_obj.save()
+    os.remove(upload_obj.file_path)
     async_to_sync(channel_layer.group_send)(channel_name, {
         'type': 'upload_message', "message": "Products saved successfully", "status": "success", "saved_records": records_saved})
     return {"status": "Success"}

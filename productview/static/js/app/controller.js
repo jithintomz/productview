@@ -69,6 +69,7 @@ app.controller("controller", function ($http, $scope, $uibModal, $httpParamSeria
             $scope.upload_message = data['message'];
             $scope.records_saved = data['saved_records'];
             $scope.upload_status = data['status'];
+            $scope.get_products()
             $scope.$apply()
         };
         $scope.socket.onclose = function (e) {
@@ -159,7 +160,7 @@ app.controller("controller", function ($http, $scope, $uibModal, $httpParamSeria
 
     $scope.open_hook_details = function (hook) {
         if (hook === undefined) {
-            hook = { "name": "", "url": "" }
+            hook = { "name": "", "url": "", "event": 1}
         }
         var modalInstance = $uibModal.open({
             animation: $scope.animationsEnabled,
@@ -227,10 +228,11 @@ app.controller('hookDetailsCtrl', function ($uibModalInstance, $http, hook, even
 
     $ctrl.events = events
     console.log($ctrl.events)
+
     $ctrl.hook = hook
 
     $ctrl.delete = function () {
-        $http.delete(`products/${$ctrl.hook.id}`).success(function (data) {
+        $http.delete(`hooks/${$ctrl.hook.id}`).success(function (data) {
             $uibModalInstance.close($ctrl.hook);
         })
     }

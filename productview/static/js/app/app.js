@@ -1,5 +1,5 @@
 /*Angular js app responsible manages the ui*/
-var app = angular.module('productViewApp', ["ngCookies","ui.bootstrap","checklist-model","ui-notification"])
+var app = angular.module('productViewApp', ["ngCookies","ui.bootstrap","checklist-model","ui-notification","angular-loading-bar"])
 
 app.config(function($interpolateProvider) {
  $interpolateProvider.startSymbol('{[{');

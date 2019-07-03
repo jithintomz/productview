@@ -1,0 +1,12 @@
+[
+  {
+    "model": "productview.event",
+    "pk": 1,
+    "fields": { "name": "Create", "code": "create_product" }
+  },
+  {
+    "model": "productview.event",
+    "pk": 2,
+    "fields": { "name": "Update", "code": "update_product" }
+  }
+]
