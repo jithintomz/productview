@@ -1,4 +1,4 @@
-#Database models for the productview application
+# Database models for the productview application
 
 from datetime import datetime
 
@@ -30,14 +30,14 @@ class Product(models.Model):
 
 class Event(models.Model):
     """Individual events used for hooks"""
-    
+
     name = models.CharField(max_length=200)
     code = models.CharField(max_length=100, unique=True)
 
 
 class WebHook(models.Model):
     """Tracks webhooks added by the user"""
-    
+
     name = models.CharField(max_length=200)
     url = models.URLField(max_length=1000)
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
