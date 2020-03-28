@@ -15,11 +15,11 @@ Technologies Used
 Basic Architecture
 ------------
 1.The uploaded file is saved to the local server file system and response is sent to user \
-2.A celery task is initiated to parse records from the csv and save it to the database in chunks \ 
+2.A celery task is initiated to parse records from the csv and save it to the database in chunks \
 3.User is updated about the status of parsing and processing through websockets \
 4.Users are allowed to add webhooks which are used to notify in case of product updates asynchronously \
 with few retries
 
 ToDo
 ------------
-1.Better and more notifications at frontend \
+1.Better and more notifications at frontend
