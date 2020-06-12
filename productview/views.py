@@ -40,7 +40,7 @@ class ProductViewSet(viewsets.ModelViewSet):
         return self.queryset
 
     def create(self, request):
-        """Creates producct instance"""
+        """Creates product instance"""
         
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
