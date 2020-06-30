@@ -2,23 +2,22 @@
 logic of rest end-points"""
 
 from django.shortcuts import render
-from django.http import HttpResponse
 from rest_framework.views import APIView
 from rest_framework import viewsets
 from rest_framework.response import Response
 from django.db.models import Q
 from django.db import IntegrityError
 
-from acme.settings import REST_FRAMEWORK as rest_settings
 from productview import utils
-from productview import tasks
-from productview.serializers import ProductSerializer, WebhookSerializer, EventSerializer
+from productview.serializers import (
+    ProductSerializer, WebhookSerializer, EventSerializer
+)
 from productview.models import Product, Upload, WebHook, Event
 
 
 def index(request):
-	response = render(request, 'index.html')
-	return response
+    response = render(request, 'index.html')
+    return response
 
 
 class ProductViewSet(viewsets.ModelViewSet):
@@ -31,24 +30,27 @@ class ProductViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         if "keyword" in self.request.query_params:
             self.queryset = self.queryset.filter(
-            	Q(name__icontains=self.request.query_params["keyword"]) |
+                Q(name__icontains=self.request.query_params["keyword"]) |
                 Q(sku__icontains=self.request.query_params["keyword"]))
         if "filter" in self.request.query_params:
             filter_array = self.request.query_params["filter"].split(",")
-            filter_array = list(map(int,filter_array))
+            filter_array = list(map(int, filter_array))
             self.queryset = self.queryset.filter(is_active__in=filter_array)
         return self.queryset
 
     def create(self, request):
         """Creates product instance"""
-        
+
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
-            serializer.validated_data["sku"] = serializer.validated_data["sku"].lower()
+            serializer.validated_data["sku"] = \
+                serializer.validated_data["sku"].lower()
             try:
                 product = serializer.save()
             except IntegrityError:
-                Product.objects.get(sku=serializer.validated_data["sku"].delete())
+                Product.objects.get(
+                    sku=serializer.validated_data["sku"]
+                ).delete()
                 product = serializer.save()
             utils.notify_hooks("create_product", product)
             return Response(status=204)
@@ -57,16 +59,23 @@ class ProductViewSet(viewsets.ModelViewSet):
 
     def update(self, request, pk):
         """Updates the product instance based on pk"""
-        
+
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
             prod_object = Product.objects.get(pk=pk)
-            serializer.validated_data["sku"] = serializer.validated_data["sku"].lower()
+            serializer.validated_data["sku"] = \
+                serializer.validated_data["sku"].lower()
             try:
-                product = serializer.update(prod_object, serializer.validated_data)
+                product = serializer.update(
+                    prod_object, serializer.validated_data
+                )
             except IntegrityError:
-                Product.objects.get(sku=serializer.validated_data["sku"].delete())
-                product = serializer.update(prod_object, serializer.validated_data)
+                Product.objects.get(
+                    sku=serializer.validated_data["sku"].delete()
+                )
+                product = serializer.update(
+                    prod_object, serializer.validated_data
+                )
             utils.notify_hooks("update_product", product)
             return Response(status=204)
         else:
