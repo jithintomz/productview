@@ -6,7 +6,7 @@ from productview.models import Product, WebHook, Event
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
-        fields = ("id", "name", "sku", "description","is_active",
+        fields = ("id", "name", "sku", "description", "is_active",
                   "upload_id", "created_time", "updated_time")
         extra_kwargs = {
             'sku': {
@@ -24,7 +24,7 @@ class WebhookSerializer(serializers.ModelSerializer):
 
 
 class EventSerializer(serializers.ModelSerializer):
-    
+
     class Meta:
         model = Event
         fields = ("id", "name", "code")
