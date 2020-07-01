@@ -1,12 +1,12 @@
 """Defines a set of asynchronous tasks used throught the app"""
 
 import csv
-import os
 
 import requests
 from celery import shared_task
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
+from django.core.files.storage import default_storage
 
 from acme.celery import app
 from productview import utils
@@ -21,7 +21,9 @@ def parse_products_from_file(upload_id):
     """
 
     upload_obj = Upload.objects.get(id=upload_id)
-    csv_reader = csv.reader(open(upload_obj.file_path, "r+"))
+    csv_reader = csv.reader(
+        default_storage.open(upload_obj.file_path, 'r+')
+    )
     header_row = next(csv_reader)
     header_row = [value.lower() for value in header_row]
     headers = ["name", "sku", "description"]
@@ -69,7 +71,7 @@ def parse_products_from_file(upload_id):
 
     upload_obj.processing_status = 2
     upload_obj.save()
-    os.remove(upload_obj.file_path)
+    default_storage.delete(upload_obj.file_path)
     async_to_sync(channel_layer.group_send)(
         channel_name,
         {
