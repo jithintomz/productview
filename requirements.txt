@@ -41,7 +41,7 @@ pubcontrol==2.4.2
 pycodestyle==2.5.0
 pycparser==2.19
 PyHamcrest==1.9.0
-PyJWT==1.7.1
+PyJWT==2.4.0
 pylint==2.3.1
 pytz==2019.1
 redis==3.2.1
